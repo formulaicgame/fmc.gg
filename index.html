@@ -114,7 +114,7 @@
 <body>
     <div class="container">
         <div class="button-wrapper">
-            <a id="downloadLink" href="#" class="download-button" download>Download</a>
+            <a id="downloadLink" href="#" class="download-button">Download</a>
             <button id="iconButton" class="icon-button icon">
                 <i id="osIcon" class="fab fa-apple icon"></i>
             </button>
@@ -198,12 +198,6 @@
         function updateDownloadButton(os, arch) {
             const url = generateDownloadUrl(os, arch);
 
-            //let extension = '';
-            //if (os === 'windows') {
-            //    extension = '.exe';
-            //}
-
-            //downloadLink.download = `fmc${extension}`;
             downloadLink.href = url;
 
             osIcon.className = `fab ${getOSIcon(os)}`;
