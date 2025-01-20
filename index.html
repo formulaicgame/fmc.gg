@@ -1,1 +1,258 @@
-Hello World
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fmc</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <style>
+        html {
+            height: 100%;
+            width: 100%;
+        }
+        body {
+            background-color: #111111;
+            margin: 0px;
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .button-wrapper {
+            display: flex;
+            gap: 4px;
+        }
+
+        .download-button {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: green;
+            color: white;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .download-button:hover {
+            background-color: darkgreen;
+        }
+        
+        .icon-button {
+            display: flex;
+            background-color: green;
+            border: none;
+            padding: 5px 20px;
+            cursor: pointer;
+            color: white;
+            transition: all 0.3s ease;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .icon-button:hover {
+            background-color: darkgreen;
+        }
+
+        .dropdown-menu {
+            height: 20vh;
+            background-color: green;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .dropdown-menu.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .menu-item {
+            padding: 0px 10px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: white;
+            transition: background-color 0.3s ease;
+            user-select: none;
+        }
+        
+        .menu-item:hover {
+            background-color: darkgreen;
+        }
+        
+        .selected {
+            background-color: darkgreen !important;
+        }
+        
+        .icon {
+            font-size: 30px;
+        }
+        
+        .subtext {
+            font-size: 11px;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="button-wrapper">
+            <a id="downloadLink" href="#" class="download-button" download>Download</a>
+            <button id="iconButton" class="icon-button icon">
+                <i id="osIcon" class="fab fa-apple icon"></i>
+            </button>
+        </div>
+        <div id="dropdownMenu" class="dropdown-menu">
+            <a href="#" class="menu-item" data-os="darwin" data-arch="aarch64">
+                <i class="fab fa-apple icon"></i>
+                <span class="subtext">M1+</span>
+            </a>
+            <a href="#" class="menu-item" data-os="darwin" data-arch="x86_64">
+                <i class="fab fa-apple icon"></i>
+                <span class="subtext">Intel</span>
+            </a>
+            <a href="#" class="menu-item" data-os="windows" data-arch="x86_64">
+                <i class="fab fa-windows icon"></i>
+            </a>
+            <a href="#" class="menu-item" data-os="linux" data-arch="x86_64">
+                <i class="fab fa-linux icon"></i>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const downloadLink = document.getElementById('downloadLink');
+        const osIcon = document.getElementById('osIcon');
+        const iconButton = document.getElementById('iconButton');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+
+        const ua = navigator.userAgent.toLowerCase();
+
+        function getPlatform() {
+            if (ua.includes('mac')) return 'darwin';
+            if (ua.includes('win')) return 'windows';
+            if (ua.includes('linux')) return 'linux';
+
+            return 'unknown';
+        }
+
+        function getArchitecture() {
+            if (ua.includes('win64')) return 'x86_64';
+            if (ua.includes('linux')) return 'x86_64';
+            if (ua.match(/os x 10_([6789]|1[01234])/)) return 'x86_64';
+            if (ua.includes("os x")) return 'aarch64';
+
+            return 'unknown';
+        }
+
+        function getOSIcon(os) {
+            switch (os) {
+                case 'darwin':
+                    return 'fa-apple';
+                case 'windows':
+                    return 'fa-windows';
+                case 'linux':
+                    return 'fa-linux';
+            }
+        }
+
+        function getOSName(os) {
+            switch (os) {
+                case 'darwin':
+                    return 'apple-darwin';
+                case 'windows':
+                    return 'pc-windows-msvc';
+                case 'linux':
+                    return `unknown-linux-gnu`;
+            }
+        }
+
+        function generateDownloadUrl(os, arch) {
+            let baseUrl = 'https://github.com/formulaicgame/fmc/releases/download/nightly/';
+
+            let extension = '';
+            if (os === 'windows') {
+                extension = '.exe';
+            }
+
+            return `${baseUrl}${arch}-${getOSName(os)}${extension}`;
+        }
+
+        function updateDownloadButton(os, arch) {
+            const url = generateDownloadUrl(os, arch);
+
+            //let extension = '';
+            //if (os === 'windows') {
+            //    extension = '.exe';
+            //}
+
+            //downloadLink.download = `fmc${extension}`;
+            downloadLink.href = url;
+
+            osIcon.className = `fab ${getOSIcon(os)}`;
+
+            // Highlight the selected item in the dropdown
+            const menuItems = dropdownMenu.querySelectorAll('.menu-item');
+            menuItems.forEach(item => {
+                if (item.dataset.os === os && item.dataset.arch === arch) {
+                    item.classList.add('selected');
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
+        }
+
+        function dropdownSetup() {
+            iconButton.addEventListener('click', () => {
+                dropdownMenu.classList.toggle('show');
+            });
+
+            const menuItemLinks = dropdownMenu.querySelectorAll('.menu-item');
+            menuItemLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const os = link.dataset.os;
+                    const arch = link.dataset.arch;
+                    updateDownloadButton(os, arch);
+                    dropdownMenu.classList.remove('show');
+                });
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!dropdownMenu.contains(e.target) && !iconButton.contains(e.target)) {
+                    dropdownMenu.classList.remove('show');
+                }
+            });
+        }
+
+        function detectOs() {
+            const os = getPlatform();
+            const arch = getArchitecture();
+            updateDownloadButton(os, arch);
+        }
+
+        window.onload = () => {
+            dropdownSetup();
+            detectOs();
+        };
+    </script>
+</body>
+</html>
