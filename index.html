@@ -23,12 +23,12 @@
         .container {
             display: flex;
             align-items: center;
-            gap: 5px;
+            justify-content: center;
         }
 
         .button-wrapper {
             display: flex;
-            gap: 4px;
+            gap: 3px;
         }
 
         .download-button {
@@ -50,6 +50,8 @@
         
         .icon-button {
             display: flex;
+            /* The apple icon is slightly smaller than the others. Enforce width so it doesn't reshape */
+            min-width: 68px;
             background-color: green;
             border: none;
             padding: 5px 20px;
@@ -64,10 +66,17 @@
             background-color: darkgreen;
         }
 
+        .dropdown-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         .dropdown-menu {
-            height: 20vh;
+            position: absolute;
+            height: 200px;
+            margin-left: 60px;
             background-color: green;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             opacity: 0;
             visibility: hidden;
             transition: all 0.3s ease;
@@ -109,9 +118,37 @@
             font-size: 11px;
             color: white;
         }
+
+        .socials {
+            position: fixed;
+            display: flex;
+            gap: 1vh;
+            top: 1vh;
+            right: 1vh;
+        }
+
+        .social-button {
+            display: flex;
+            flex: 1;
+            min-width: 40px;
+            padding: 10px;
+            justify-content: center;
+            background-color: #444444;
+            color: #111111;
+            font-size: 30px;
+            text-decoration: none;
+        }
     </style>
 </head>
 <body>
+    <div class="socials">
+        <a href="https://discord.gg/VMgFmdsQ6m" class="social-button">
+            <i class="fa-brands fa-discord"></i>
+        </a>
+        <a href="https://github.com/formulaicgame/fmc" class="social-button">
+            <i class="fa-brands fa-github"></i>
+        </a>
+    </div>
     <div class="container">
         <div class="button-wrapper">
             <a id="downloadLink" href="#" class="download-button">Download</a>
@@ -119,128 +156,107 @@
                 <i id="osIcon" class="fab fa-apple icon"></i>
             </button>
         </div>
-        <div id="dropdownMenu" class="dropdown-menu">
-            <a href="#" class="menu-item" data-os="darwin" data-arch="aarch64">
-                <i class="fab fa-apple icon"></i>
-                <span class="subtext">M1+</span>
-            </a>
-            <a href="#" class="menu-item" data-os="darwin" data-arch="x86_64">
-                <i class="fab fa-apple icon"></i>
-                <span class="subtext">Intel</span>
-            </a>
-            <a href="#" class="menu-item" data-os="windows" data-arch="x86_64">
-                <i class="fab fa-windows icon"></i>
-            </a>
-            <a href="#" class="menu-item" data-os="linux" data-arch="x86_64">
-                <i class="fab fa-linux icon"></i>
-            </a>
+        <div class="dropdown-wrapper">
+            <div id="dropdownMenu" class="dropdown-menu">
+                <a class="menu-item" data-platform="macos-arm" data-arch="aarch64">
+                    <i class="fab fa-apple icon"></i>
+                    <span class="subtext">M1+</span>
+                </a>
+                <a class="menu-item" data-platform="macos-intel">
+                    <i class="fab fa-apple icon"></i>
+                    <span class="subtext">Intel</span>
+                </a>
+                <a class="menu-item" data-platform="windows">
+                    <i class="fab fa-windows icon"></i>
+                </a>
+                <a class="menu-item" data-platform="linux">
+                    <i class="fab fa-linux icon"></i>
+                </a>
+            </div>
         </div>
     </div>
 
     <script>
-        const downloadLink = document.getElementById('downloadLink');
-        const osIcon = document.getElementById('osIcon');
-        const iconButton = document.getElementById('iconButton');
-        const dropdownMenu = document.getElementById('dropdownMenu');
+        const downloadLink = document.getElementById("downloadLink");
+        const osIcon = document.getElementById("osIcon");
+        const iconButton = document.getElementById("iconButton");
+        const dropdownMenu = document.getElementById("dropdownMenu");
 
-        const ua = navigator.userAgent.toLowerCase();
+        function updateDownloadButton(platform) {
+            const baseUrl = "https://github.com/formulaicgame/fmc/releases/download/nightly/";
 
-        function getPlatform() {
-            if (ua.includes('mac')) return 'darwin';
-            if (ua.includes('win')) return 'windows';
-            if (ua.includes('linux')) return 'linux';
-
-            return 'unknown';
-        }
-
-        function getArchitecture() {
-            if (ua.includes('win64')) return 'x86_64';
-            if (ua.includes('linux')) return 'x86_64';
-            if (ua.match(/os x 10_([6789]|1[01234])/)) return 'x86_64';
-            if (ua.includes("os x")) return 'aarch64';
-
-            return 'unknown';
-        }
-
-        function getOSIcon(os) {
-            switch (os) {
-                case 'darwin':
-                    return 'fa-apple';
-                case 'windows':
-                    return 'fa-windows';
-                case 'linux':
-                    return 'fa-linux';
-            }
-        }
-
-        function getOSName(os) {
-            switch (os) {
-                case 'darwin':
-                    return 'apple-darwin';
-                case 'windows':
-                    return 'pc-windows-msvc';
-                case 'linux':
-                    return `unknown-linux-gnu`;
-            }
-        }
-
-        function generateDownloadUrl(os, arch) {
-            let baseUrl = 'https://github.com/formulaicgame/fmc/releases/download/nightly/';
-
-            let extension = '';
-            if (os === 'windows') {
-                extension = '.exe';
+            let extension = "";
+            if (platform === "windows") {
+                extension = ".exe";
             }
 
-            return `${baseUrl}${arch}-${getOSName(os)}${extension}`;
-        }
+            downloadLink.href = `${baseUrl}fmc-${platform}${extension}`;
 
-        function updateDownloadButton(os, arch) {
-            const url = generateDownloadUrl(os, arch);
-
-            downloadLink.href = url;
-
-            osIcon.className = `fab ${getOSIcon(os)}`;
+            switch(platform) {
+                case "macos-intel":
+                    osIcon.className = `fab fa-apple`;
+                    break;
+                case "macos-arm":
+                    osIcon.className = `fab fa-apple`;
+                    break;
+                case "windows":
+                    osIcon.className = `fab fa-windows`;
+                    break;
+                case "linux":
+                    osIcon.className = `fab fa-linux`;
+                    break;
+            }
 
             // Highlight the selected item in the dropdown
-            const menuItems = dropdownMenu.querySelectorAll('.menu-item');
+            const menuItems = dropdownMenu.querySelectorAll(".menu-item");
             menuItems.forEach(item => {
-                if (item.dataset.os === os && item.dataset.arch === arch) {
-                    item.classList.add('selected');
+                if (item.dataset.platform === platform) {
+                    item.classList.add("selected");
                 } else {
-                    item.classList.remove('selected');
+                    item.classList.remove("selected");
                 }
             });
         }
 
         function dropdownSetup() {
-            iconButton.addEventListener('click', () => {
-                dropdownMenu.classList.toggle('show');
+            iconButton.addEventListener("click", () => {
+                dropdownMenu.classList.toggle("show");
             });
 
-            const menuItemLinks = dropdownMenu.querySelectorAll('.menu-item');
+            const menuItemLinks = dropdownMenu.querySelectorAll(".menu-item");
             menuItemLinks.forEach(link => {
-                link.addEventListener('click', (e) => {
+                link.addEventListener("click", (e) => {
                     e.preventDefault();
-                    const os = link.dataset.os;
-                    const arch = link.dataset.arch;
-                    updateDownloadButton(os, arch);
-                    dropdownMenu.classList.remove('show');
+                    const platform = link.dataset.platform;
+                    updateDownloadButton(platform);
+                    dropdownMenu.classList.remove("show");
                 });
             });
 
             // Close dropdown when clicking outside
-            document.addEventListener('click', (e) => {
+            document.addEventListener("click", (e) => {
                 if (!dropdownMenu.contains(e.target) && !iconButton.contains(e.target)) {
-                    dropdownMenu.classList.remove('show');
+                    dropdownMenu.classList.remove("show");
                 }
             });
         }
 
+        function getPlatform() {
+            const ua = navigator.userAgent.toLowerCase();
+
+            if (ua.includes("mac")) {
+                if (ua.match(/os x 10_([6789]|1[01234])/)) return "macos-intel";
+                if (ua.includes("os x")) return "macos-arm";
+            };
+            if (ua.includes("win")) return "windows";
+            if (ua.includes("linux")) return "linux";
+
+            return "windows";
+        }
+
         function detectOs() {
-            const os = getPlatform();
-            const arch = getArchitecture();
-            updateDownloadButton(os, arch);
+            const platform = getPlatform();
+            updateDownloadButton(platform);
         }
 
         window.onload = () => {
