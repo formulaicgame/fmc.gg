@@ -50,6 +50,7 @@
         
         .icon-button {
             display: flex;
+            flex-direction: column;
             /* The apple icon is slightly smaller than the others. Enforce width so it doesn't reshape */
             min-width: 68px;
             background-color: green;
@@ -154,6 +155,7 @@
             <a id="downloadLink" href="#" class="download-button">Download</a>
             <button id="iconButton" class="icon-button icon">
                 <i id="osIcon" class="fab fa-apple icon"></i>
+                <span id="osIconText" class="subtext"></span>
             </button>
         </div>
         <div class="dropdown-wrapper">
@@ -179,6 +181,7 @@
     <script>
         const downloadLink = document.getElementById("downloadLink");
         const osIcon = document.getElementById("osIcon");
+        const osIconText = document.getElementById("osIconText");
         const iconButton = document.getElementById("iconButton");
         const dropdownMenu = document.getElementById("dropdownMenu");
 
@@ -195,15 +198,19 @@
             switch(platform) {
                 case "macos-intel":
                     osIcon.className = `fab fa-apple`;
+                    osIconText.textContent = 'Intel'
                     break;
                 case "macos-arm":
                     osIcon.className = `fab fa-apple`;
+                    osIconText.textContent = 'M1+'
                     break;
                 case "windows":
                     osIcon.className = `fab fa-windows`;
+                    osIconText.textContent = ''
                     break;
                 case "linux":
                     osIcon.className = `fab fa-linux`;
+                    osIconText.textContent = ''
                     break;
             }
 
