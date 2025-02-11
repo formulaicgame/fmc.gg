@@ -49,6 +49,8 @@
         }
         
         .icon-button {
+            /* For some reason it changes to sans-serif here */
+            font-family: serif;
             display: flex;
             flex-direction: column;
             /* The apple icon is slightly smaller than the others. Enforce width so it doesn't reshape */
@@ -198,7 +200,7 @@
             switch(platform) {
                 case "macos-intel":
                     osIcon.className = `fab fa-apple`;
-                    osIconText.textContent = 'Intel'
+                    osIconText.innerText = 'Intel'
                     break;
                 case "macos-arm":
                     osIcon.className = `fab fa-apple`;
