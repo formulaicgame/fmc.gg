@@ -189,12 +189,7 @@
         function updateDownloadButton(platform) {
             const baseUrl = "https://github.com/formulaicgame/fmc/releases/download/nightly/";
 
-            let extension = "";
-            if (platform === "windows") {
-                extension = ".exe";
-            }
-
-            downloadLink.href = `${baseUrl}fmc-${platform}${extension}`;
+            downloadLink.href = `${baseUrl}fmc-${platform}.zip`;
 
             switch(platform) {
                 case "macos-intel":
